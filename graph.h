@@ -16,7 +16,8 @@ int   nVertices(Graph);
 int   isConnected(Graph, char *, char *);
 void  showGraph(Graph,int);
 // Jesse colville
-// Number of edges for a vertex (degrees)
-int nEdgesV(Graph, char *);
+// Number of inbound links
+int nEdgesInV(Graph, char *);
+int nEdgesOutV(Graph, char*);
 
 #endif

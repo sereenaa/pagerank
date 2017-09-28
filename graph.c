@@ -164,13 +164,26 @@ int addVertex(char *str, char **names, int N)
 	return N;
 }
 
-// Takes in a graph and a vertex and finds number of edges
-int nEdgesV(Graph g, char* v) {
+// Jesse Colville
+// Iterates horizontally across a vertex to find number of edges
+int nEdgesInV(Graph g, char* v) {
 	assert(g);
 	int row = vertexID(v, g->vertex,g->nV);
-	int column;
+	int column = 0;
 	int sum = 0;
 	for (column = 0; column < g->nV; column++) {
+		if (g->edges[row][column]) sum++;
+	}
+	return sum;
+}
+
+// Iterates vertically down a vertex to find number of edges
+int nEdgesInV(Graph g, char* v) {
+	assert(g);
+	int column = vertexID(v, g->vertex,g->nV);
+	int row = 0;
+	int sum = 0;
+	for (row = 0; row < g->nV; row++) {
 		if (g->edges[row][column]) sum++;
 	}
 	return sum;
