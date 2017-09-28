@@ -163,3 +163,15 @@ int addVertex(char *str, char **names, int N)
 	names[N] = strdup(str);
 	return N;
 }
+
+// Takes in a graph and a vertex and finds number of edges
+int nEdgesV(Graph g, char* v) {
+	assert(g);
+	int row = vertexID(v, g->vertex,g->nV);
+	int column;
+	int sum = 0;
+	for (column = 0; column < g->nV; column++) {
+		if (g->edges[row][column]) sum++;
+	}
+	return sum;
+}
