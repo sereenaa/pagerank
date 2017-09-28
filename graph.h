@@ -10,7 +10,7 @@ typedef struct GraphRep *Graph;
 
 Graph newGraph(int);
 void  disposeGraph(Graph);
-int   addEdge(Graph,char *,char *);
+int   addEdge(Graph,char *,char *); // args: Graph, source, destination
 int   nVertices(Graph);
 int   isConnected(Graph, char *, char *);
 void  showGraph(Graph,int);

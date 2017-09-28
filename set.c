@@ -1,5 +1,6 @@
 // set.c ... simple, inefficient Set of Strings
 // Written by John Shepherd, September 2015
+// Modded by Jesse Colville
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -166,4 +167,17 @@ static int findNode(Link list, char *str, Link *cur, Link *pre)
 	}
 	*cur = curr; *pre = prev;
 	return (curr != NULL && strEQ(str,curr->val));
+}
+
+
+// Gets the nth element from a set
+// Written by Jesse Colville
+char *getNth(Set s, int n) {
+	assert(n < nElems(s));
+	int i;
+	Link curr = s->elems;
+	for (i = 0; i < n; i++) {
+		curr = curr->next;
+	}
+	return curr->val;
 }
