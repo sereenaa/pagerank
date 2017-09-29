@@ -24,8 +24,13 @@ Graph newGraph();
 void  disposeGraph(Graph);
 int   addEdge(Graph,char *,char *);
 int   nVertices(Graph);
-int   isConnected(Graph, char *, char *);
+int   isConnectedOut(Graph, char *, char *);
+int   isConnectedIn(Graph, char *, char *);
 void  showGraph(Graph,int);
+int nEdgesInV(Graph, char *);
+int nEdgesOutV(Graph, char*);
+int outgoungFromOutgoing(Graph g, char *v);
+int incomingFromOutgoing(Graph, char *);
 
 static int vertexID(char *, char **, int);
 int addVertex(char *, char **, int);
@@ -94,7 +99,7 @@ int addEdge(Graph g, char *src, char *dest)
 
 // isConnected(Graph,Src,Dest)
 // - check whether there is an edge from Src->Dest
-int isConnected(Graph g, char *src, char *dest)
+int isConnectedOut(Graph g, char *src, char *dest)
 {
 	assert(g != NULL);
 	int v = vertexID(src,g->vertex,g->nV);
@@ -103,6 +108,18 @@ int isConnected(Graph g, char *src, char *dest)
 		return 0;
 	else
 		return g->edges[v][w];
+}
+
+// Jesse Colville
+int isConnectedIn(Graph g, char *src, char *dest)
+{
+	assert(g != NULL);
+	int v = vertexID(src,g->vertex,g->nV);
+	int w = vertexID(dest,g->vertex,g->nV);
+	if (v < 0 || w < 0)
+		return 0;
+	else
+		return g->edges[w][v];
 }
 
 // nVertices(Graph)
@@ -166,7 +183,7 @@ int addVertex(char *str, char **names, int N)
 
 // Jesse Colville
 // Iterates horizontally across a vertex to find number of edges
-int nEdgesInV(Graph g, char* v) {
+int nEdgesOutV(Graph g, char* v) {
 	assert(g);
 	int row = vertexID(v, g->vertex,g->nV);
 	int column = 0;
@@ -185,6 +202,47 @@ int nEdgesInV(Graph g, char* v) {
 	int sum = 0;
 	for (row = 0; row < g->nV; row++) {
 		if (g->edges[row][column]) sum++;
+	}
+	return sum;
+}
+
+
+// Find the sum of outgoing links of nodes connected to target node
+// i.e. denominator on wOut
+int outgoingFromOutgoing(Graph g, char *v) {
+	assert(g);
+	int row = vertexID(v, g->vertex, g->nV);
+	int column = 0;
+	int rowNested = 0;
+	int columnNested = 0;
+	int sum = 0;
+	for (column = 0; column < g->nV; column++) {
+		if (g->edges[row][column]) {
+			rowNested = column;
+			for (columnNested = 0; columnNested < g->nV; columnNested++) {
+				if (g->edges[rowNested][columnNested]) sum++;
+			}
+		}
+	}
+	return sum;
+}
+
+// Find the sum of incoming links of nodes connected to target node
+// i.e. denominator on wIn
+int incomingFromOutgoing(Graph g, char *v) {
+	assert(g);
+	int row = vertexID(v, g->vertex, g->nV);
+	int column = 0;
+	int rowNested = 0;
+	int columnNested = 0;
+	int sum = 0;
+	for (column = 0; column < g->nV; column++) {
+		if (g->edges[row][column]) {
+			columnNested = column;
+			for (rowNested = 0; rowNested < g->nV; rowNested++) {
+				if (g->edges[rowNested][columnNested]) sum++;
+			}
+		}
 	}
 	return sum;
 }

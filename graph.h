@@ -13,11 +13,15 @@ Graph newGraph(int);
 void  disposeGraph(Graph);
 int   addEdge(Graph,char *,char *); // args: Graph, source, destination
 int   nVertices(Graph);
-int   isConnected(Graph, char *, char *);
+int   isConnectedOut(Graph, char *, char *);
 void  showGraph(Graph,int);
+// Jesse Colville
+// Checks for inbound link
+int   isConnectedIn(Graph, char *, char *);
 // Jesse colville
-// Number of inbound links
 int nEdgesInV(Graph, char *);
 int nEdgesOutV(Graph, char*);
+int outgoungFromOutgoing(Graph g, char *v);
+int incomingFromOutgoing(Graph, char *);
 
 #endif

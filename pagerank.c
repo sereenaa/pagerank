@@ -26,7 +26,7 @@ dataList createDataList();
 dataList copyDataList(dataList);
 void insertDataListNode(dataList L, char *key, int degrees, double PRVal);
 void showDataList(dataList L);
-double calcPROthers(dataList, Node *);
+double calcPROthers(dataList, Graph, Node *);
 
 int main(int argc, char *argv[]) {
 	// Get arguments
@@ -41,6 +41,10 @@ int main(int argc, char *argv[]) {
 	// Get set of urls and create and initialise the graph
 	Set urls = getCollection("collection.txt");
 	Graph g = getGraph(urls);
+	showGraph(g, 0);
+	showGraph(g, 1);
+	//printf("%d %d %d %d %d %d %d\n", outgoingFromOutgoing(g, getNth(urls, 0)), outgoingFromOutgoing(g, getNth(urls, 1)), outgoingFromOutgoing(g, getNth(urls, 2)), outgoingFromOutgoing(g, getNth(urls, 3)), outgoingFromOutgoing(g, getNth(urls, 4)), outgoingFromOutgoing(g, getNth(urls, 5)), incomingFromOutgoing(g, getNth(urls, 6)));
+	
 
 	// Calculate pagerank
 	dataList L = calculatePageRank(g, urls, d, diffPR, maxIt);
@@ -51,14 +55,14 @@ int main(int argc, char *argv[]) {
 
 dataList calculatePageRank(Graph g, Set urls, double d, double diffPR, int maxIt) {
 	assert(g);
-	nPages = nElems(urls);
+	int nPages = nElems(urls);
 	// Create an empty list
 	dataList newL = createDataList();
 
 	// Initialise list with url, degrees, and PRValue to 1/numberURLS
 	int i;
 	for (i = 0; i < nElems(urls); i++) {
-		insertDataListNode(newL, getNth(urls, i), nEdgesV(g, getNth(urls, i)), 1.0/nPages);
+		insertDataListNode(newL, getNth(urls, i), nEdgesOutV(g, getNth(urls, i)), 1.0/nPages);
 	}
 
 	// Copy the list which will as we need to keep track of prev iteration
@@ -73,8 +77,11 @@ dataList calculatePageRank(Graph g, Set urls, double d, double diffPR, int maxIt
 		i++;
 		// For each page
 		for (curr = newL->first; curr != NULL; curr = curr->next) {
-			curr->PRVal = (1.0 - d)/nPages + d*calcPROthers(prevL, curr->key);
+			curr->PRVal = (1.0 - d)/nPages + d*calcPROthers(prevL, g, curr);
 		}
+		/*showDataList(prevL);
+		showDataList(newL);
+		printf("\n");*/
 		prevL = copyDataList(newL);
 	}
 }
@@ -137,14 +144,28 @@ dataList copyDataList(dataList L) {
 }
 
 // Calculates the "second half" of the page rank formula
-double calcPROthers(dataList L, char *skip) {
+double calcPROthers(dataList L, Graph g, Node *n) {
 	assert(L);
 	Node *curr = L->first;
 	double sum = 0;
 	double wIn = 0;
 	double wOut = 0;
+	int wInDenom = incomingFromOutgoing(g, n->key);
+	int wOutDenom = outgoingFromOutgoing(g, n->key);
+	double itVal = 0;
 	for (curr; curr != NULL; curr = curr->next) {
-		if (strcmp(curr->key, skip) == 0) continue;
+		if (strcmp(curr->key, n->key) == 0) continue;
+		wInDenom = incomingFromOutgoing(g, n->key);
+		wOutDenom = outgoingFromOutgoing(g, n->key);
+		if (isConnectedOut(g, n->key, curr->key)) {
+			wIn = nEdgesInV(g, curr->key) * 1.0 / wInDenom;
+			if (wOutDenom == 0) {
+				wOut = nEdgesOutV(g, curr->key) * 1.0 / 0.5;
+			} else {
+				wOut = nEdgesOutV(g, curr->key) * 1.0 / wOutDenom;
+			}
+			sum += curr->PRVal * wIn * wOut;
+		}
 	}
 	return sum;
 }
