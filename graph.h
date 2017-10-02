@@ -22,6 +22,6 @@ int   isConnectedIn(Graph, char *, char *);
 int nEdgesInV(Graph, char *);
 int nEdgesOutV(Graph, char*);
 int outgoungFromOutgoing(Graph g, char *v);
-int incomingFromOutgoing(Graph, char *);
+int incomingFromIncoming(Graph, char *);
 
 #endif

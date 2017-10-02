@@ -41,13 +41,14 @@ int main(int argc, char *argv[]) {
 	// Get set of urls and create and initialise the graph
 	Set urls = getCollection("collection.txt");
 	Graph g = getGraph(urls);
-	showGraph(g, 0);
+	/*showGraph(g, 0);
 	showGraph(g, 1);
-	//printf("%d %d %d %d %d %d %d\n", outgoingFromOutgoing(g, getNth(urls, 0)), outgoingFromOutgoing(g, getNth(urls, 1)), outgoingFromOutgoing(g, getNth(urls, 2)), outgoingFromOutgoing(g, getNth(urls, 3)), outgoingFromOutgoing(g, getNth(urls, 4)), outgoingFromOutgoing(g, getNth(urls, 5)), incomingFromOutgoing(g, getNth(urls, 6)));
-	
+	printf("%d %d %d %d %d %d %d\n", outgoingFromOutgoing(g, getNth(urls, 0)), outgoingFromOutgoing(g, getNth(urls, 1)), outgoingFromOutgoing(g, getNth(urls, 2)), outgoingFromOutgoing(g, getNth(urls, 3)), outgoingFromOutgoing(g, getNth(urls, 4)), outgoingFromOutgoing(g, getNth(urls, 5)), incomingFromOutgoing(g, getNth(urls, 6)));
+	*/
 
 	// Calculate pagerank
 	dataList L = calculatePageRank(g, urls, d, diffPR, maxIt);
+	showDataList(L);
 
 
 	return 0;
@@ -84,6 +85,7 @@ dataList calculatePageRank(Graph g, Set urls, double d, double diffPR, int maxIt
 		printf("\n");*/
 		prevL = copyDataList(newL);
 	}
+	return newL;
 }
 
 // Create an empty list
@@ -150,13 +152,11 @@ double calcPROthers(dataList L, Graph g, Node *n) {
 	double sum = 0;
 	double wIn = 0;
 	double wOut = 0;
-	int wInDenom = incomingFromOutgoing(g, n->key);
+	int wInDenom = incomingFromIncoming(g, n->key);
 	int wOutDenom = outgoingFromOutgoing(g, n->key);
 	double itVal = 0;
 	for (curr; curr != NULL; curr = curr->next) {
 		if (strcmp(curr->key, n->key) == 0) continue;
-		wInDenom = incomingFromOutgoing(g, n->key);
-		wOutDenom = outgoingFromOutgoing(g, n->key);
 		if (isConnectedOut(g, n->key, curr->key)) {
 			wIn = nEdgesInV(g, curr->key) * 1.0 / wInDenom;
 			if (wOutDenom == 0) {
@@ -164,8 +164,10 @@ double calcPROthers(dataList L, Graph g, Node *n) {
 			} else {
 				wOut = nEdgesOutV(g, curr->key) * 1.0 / wOutDenom;
 			}
-			sum += curr->PRVal * wIn * wOut;
+			sum += 1.0 * curr->PRVal * wIn * wOut;
+			printf("n = %s, curr = %s\nnedgesinv = %d nedgesoutv = %d\nwInDen = %d wOutDenom = %d\nwin = %lf wout = %lf\nsum = %lf\n\n",n->key,curr->key,nEdgesInV(g, curr->key), nEdgesOutV(g, curr->key), wInDenom, wOutDenom,wIn, wOut, sum);
 		}
 	}
+	printf("\n\n\n");
 	return sum;
 }

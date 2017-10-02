@@ -30,7 +30,7 @@ void  showGraph(Graph,int);
 int nEdgesInV(Graph, char *);
 int nEdgesOutV(Graph, char*);
 int outgoungFromOutgoing(Graph g, char *v);
-int incomingFromOutgoing(Graph, char *);
+int incomingFromIncoming(Graph, char *);
 
 static int vertexID(char *, char **, int);
 int addVertex(char *, char **, int);
@@ -229,20 +229,23 @@ int outgoingFromOutgoing(Graph g, char *v) {
 
 // Find the sum of incoming links of nodes connected to target node
 // i.e. denominator on wIn
-int incomingFromOutgoing(Graph g, char *v) {
+int incomingFromIncoming(Graph g, char *v) {
 	assert(g);
 	int row = vertexID(v, g->vertex, g->nV);
 	int column = 0;
 	int rowNested = 0;
-	int columnNested = 0;
 	int sum = 0;
 	for (column = 0; column < g->nV; column++) {
 		if (g->edges[row][column]) {
-			columnNested = column;
 			for (rowNested = 0; rowNested < g->nV; rowNested++) {
-				if (g->edges[rowNested][columnNested]) sum++;
+				if (g->edges[rowNested][column]) sum++;
 			}
 		}
+
+	}
+	column = vertexID(v, g->vertex, g->nV);
+	for (row = 0; row < g->nV; row++) {
+		if (g->edges[row][column]) sum++;
 	}
 	return sum;
 }
