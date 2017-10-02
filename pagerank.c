@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 	// Calculate pagerank
 	dataList L = calculatePageRank(g, urls, d, diffPR, maxIt);
 	myRevBubble(L);
-	//showDataList(L);
+	showDataList(L);
 
 	// Print to pagerankList.txt
 	FILE *fp = fopen("pagerankList.txt", "w");
@@ -162,7 +162,7 @@ double calcPROthers(dataList L, Graph g, Node *n) {
 	double sum = 0;
 	double wIn = 0;
 	double wOut = 0;
-	int wInDenom = incomingFromIncoming(g, n->key);
+	int wInDenom = incomingFromOutgoing(g, n->key);
 	int wOutDenom = outgoingFromOutgoing(g, n->key);
 	double itVal = 0;
 	for (curr; curr != NULL; curr = curr->next) {
