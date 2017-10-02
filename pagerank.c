@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 	for (curr = L->first; curr != NULL; curr = curr->next) {
 		fprintf(fp, "%s, %d, %lf\n", curr->key, curr->degrees, curr->PRVal);
 	}
-
+	fclose(fp);
 
 	return 0;
 }
