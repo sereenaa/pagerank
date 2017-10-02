@@ -27,6 +27,7 @@ dataList copyDataList(dataList);
 void insertDataListNode(dataList L, char *key, int degrees, double PRVal);
 void showDataList(dataList L);
 double calcPROthers(dataList, Graph, Node *);
+void myRevBubble(dataList);
 
 int main(int argc, char *argv[]) {
 	// Get arguments
@@ -41,13 +42,12 @@ int main(int argc, char *argv[]) {
 	// Get set of urls and create and initialise the graph
 	Set urls = getCollection("collection.txt");
 	Graph g = getGraph(urls);
-	/*showGraph(g, 0);
-	showGraph(g, 1);
-	printf("%d %d %d %d %d %d %d\n", outgoingFromOutgoing(g, getNth(urls, 0)), outgoingFromOutgoing(g, getNth(urls, 1)), outgoingFromOutgoing(g, getNth(urls, 2)), outgoingFromOutgoing(g, getNth(urls, 3)), outgoingFromOutgoing(g, getNth(urls, 4)), outgoingFromOutgoing(g, getNth(urls, 5)), incomingFromOutgoing(g, getNth(urls, 6)));
-	*/
 
 	// Calculate pagerank
 	dataList L = calculatePageRank(g, urls, d, diffPR, maxIt);
+	showDataList(L);
+	printf("\n");
+	myRevBubble(L);
 	showDataList(L);
 
 
@@ -80,9 +80,6 @@ dataList calculatePageRank(Graph g, Set urls, double d, double diffPR, int maxIt
 		for (curr = newL->first; curr != NULL; curr = curr->next) {
 			curr->PRVal = (1.0 - d)/nPages + d*calcPROthers(prevL, g, curr);
 		}
-		/*showDataList(prevL);
-		showDataList(newL);
-		printf("\n");*/
 		prevL = copyDataList(newL);
 	}
 	return newL;
@@ -122,6 +119,10 @@ void insertDataListNode(dataList L, char *key, int degrees, double PRVal) {
 void showDataList(dataList L) {
 	assert(L);
 	Node *curr = L->first;
+	if (curr == NULL) {
+		printf("Empty list.\n");
+		return;
+	}
 	while (curr != NULL) {
 		printf("%s, %d, %lf\n", curr->key, curr->degrees, curr->PRVal);
 		curr = curr->next;
@@ -165,9 +166,34 @@ double calcPROthers(dataList L, Graph g, Node *n) {
 				wOut = nEdgesOutV(g, curr->key) * 1.0 / wOutDenom;
 			}
 			sum += 1.0 * curr->PRVal * wIn * wOut;
-			printf("n = %s, curr = %s\nnedgesinv = %d nedgesoutv = %d\nwInDen = %d wOutDenom = %d\nwin = %lf wout = %lf\nsum = %lf\n\n",n->key,curr->key,nEdgesInV(g, curr->key), nEdgesOutV(g, curr->key), wInDenom, wOutDenom,wIn, wOut, sum);
+			//printf("n = %s, curr = %s\nnedgesinv = %d nedgesoutv = %d\nwInDen = %d wOutDenom = %d\nwin = %lf wout = %lf\nsum = %lf\n\n",n->key,curr->key,nEdgesInV(g, curr->key), nEdgesOutV(g, curr->key), wInDenom, wOutDenom,wIn, wOut, sum);
 		}
 	}
-	printf("\n\n\n");
 	return sum;
+}
+
+// Bubble sort dataList in descending order
+void myRevBubble(dataList L) {
+	Node *head = L->first;
+	Node *n = head;
+	char tempKey[20];
+	double tempPR = 0;
+	if (head == NULL || head->next == NULL) return;
+	int swapped = 1;
+	while (swapped) {
+		swapped = 0;
+		for (n = L->first; n->next != NULL; n = n->next) {
+			if (n->PRVal < n->next->PRVal) {
+				// Switch data
+				strcpy(tempKey, n->key);
+				strcpy(n->key, n->next->key);
+				strcpy(n->next->key, tempKey);
+				tempPR = n->PRVal;
+				n->PRVal = n->next->PRVal;
+				n->next->PRVal = tempPR;
+
+				swapped = 1;
+			}
+		}
+	}
 }
