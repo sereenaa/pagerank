@@ -45,10 +45,19 @@ int main(int argc, char *argv[]) {
 
 	// Calculate pagerank
 	dataList L = calculatePageRank(g, urls, d, diffPR, maxIt);
-	showDataList(L);
-	printf("\n");
 	myRevBubble(L);
-	showDataList(L);
+	//showDataList(L);
+
+	// Print to pagerankList.txt
+	FILE *fp = fopen("pagerankList.txt", "w");
+	if (fp == NULL) {
+		fprintf(stderr, "Could not open pagerankList.txt for writing.\n");
+		exit(1);
+	}
+	Node *curr = L->first;
+	for (curr = L->first; curr != NULL; curr = curr->next) {
+		fprintf(fp, "%s, %d, %lf\n", curr->key, curr->degrees, curr->PRVal);
+	}
 
 
 	return 0;
