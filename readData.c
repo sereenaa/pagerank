@@ -1,4 +1,4 @@
-// Written by Jesse Colville, September 2017
+// Written by Jesse Colville, October 2017
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,10 +7,8 @@
 #include "graph.h"
 #include "set.h"
 #include "assert.h"
-#define MAXURL 20
+#include "readData.h"
 
-Set getCollection(char *);
-Graph getGraph(Set);
 
 // Function that takes in a file and returns a set with each string
 Set getCollection(char *collection) {

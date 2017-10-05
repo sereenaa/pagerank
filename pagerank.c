@@ -5,8 +5,8 @@
 #include "queue.h"
 #include "graph.h"
 #include "set.h"
+#include "readData.h"
 #include "assert.h"
-#define MAXURL 20
 
 typedef struct Node {
 	char key[MAXURL];
@@ -29,7 +29,7 @@ void showDataList(dataList L);
 double calcPROthers(dataList, Graph, Node *);
 void myRevBubble(dataList);
 
-int main(int argc, char *argv[]) {
+int pagerank(int argc, char *argv[]) {
 	// Get arguments
 	if (argc != 4) {
 		fprintf(stderr, "Incorrect number of arguments.\n");
@@ -42,6 +42,7 @@ int main(int argc, char *argv[]) {
 	// Get set of urls and create and initialise the graph
 	Set urls = getCollection("collection.txt");
 	Graph g = getGraph(urls);
+	showGraph(g, 1);
 
 	// Calculate pagerank
 	dataList L = calculatePageRank(g, urls, d, diffPR, maxIt);
@@ -164,13 +165,11 @@ double calcPROthers(dataList L, Graph g, Node *n) {
 	double wOut = 0;
 	int wInDenom = incomingFromOutgoing(g, n->key);
 	int wOutDenom = outgoingFromOutgoing(g, n->key);
-	double itVal = 0;
-	for (curr; curr != NULL; curr = curr->next) {
-		if (strcmp(curr->key, n->key) == 0) continue;
+	for (curr = L->first; curr != NULL; curr = curr->next) {
 		if (isConnectedOut(g, n->key, curr->key)) {
 			wIn = nEdgesInV(g, curr->key) * 1.0 / wInDenom;
 			if (wOutDenom == 0) {
-				wOut = nEdgesOutV(g, curr->key) * 1.0 / 0.5;
+				wOut = 0.5;
 			} else {
 				wOut = nEdgesOutV(g, curr->key) * 1.0 / wOutDenom;
 			}
@@ -187,6 +186,7 @@ void myRevBubble(dataList L) {
 	Node *n = head;
 	char tempKey[20];
 	double tempPR = 0;
+	int tempDeg = 0;
 	if (head == NULL || head->next == NULL) return;
 	int swapped = 1;
 	while (swapped) {
@@ -200,6 +200,9 @@ void myRevBubble(dataList L) {
 				tempPR = n->PRVal;
 				n->PRVal = n->next->PRVal;
 				n->next->PRVal = tempPR;
+				tempDeg = n->degrees;
+				n->degrees = n->next->degrees;
+				n->next->degrees = tempDeg;
 
 				swapped = 1;
 			}

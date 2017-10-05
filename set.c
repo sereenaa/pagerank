@@ -181,3 +181,9 @@ char *getNth(Set s, int n) {
 	}
 	return curr->val;
 }
+
+void insertInvWord(Set s, char *word) {
+	assert(s);
+	
+
+}
