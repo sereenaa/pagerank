@@ -1,5 +1,6 @@
 // queue.c ... simple Queue of Strings
 // Written by John Shepherd, September 2015
+// Modified by Jesse Colville October 2017
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -116,7 +117,10 @@ static Link newNode(char *str)
 {
 	Link new = malloc(sizeof(Node));
 	assert(new != NULL);
-	new->val = strdup(str);
+	// Change strdup to malloc + strcpy to work with compiler
+	new->val = malloc(strlen(str)+1);
+	assert(new->val != NULL);
+	strcpy(new->val, str);
 	new->next = NULL;
 	return new;
 }

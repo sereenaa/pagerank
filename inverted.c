@@ -12,36 +12,55 @@
 #include "readData.h"
 #include "assert.h"
 
-#define MAX_WORD_SIZE 100
 
 // Data struct for list of a list to represent which urls words are contained in
 typedef struct lListRep {
 	struct key *first;
-	int nElems;
+	int nWords;
 } lListRep;
 
 typedef struct key {
-	char word[MAX_WORD_SIZE];
+	char *word;
+	int nUrls;
 	struct urlNode *urls;
 	struct key *next;
 } key;
 
 typedef struct urlNode {
-	char url[MAXURL];
+	char *url;
 	struct urlNode *next;
 } urlNode;
+
+lListRep *createLList();
+void addWord(lListRep *, char *);
+int findWord(lListRep *, char *);
+void addURL(lListRep *, char *, char *);
+int findURL(key *, char *);
+void showlListRep(lListRep *);
 
 
 int main(void) {
 
 	FILE *fp; 
-	char urlIn[MAXURL] = {0};
-	char urlInTxt[MAXURL] = {0};
-	char word[50] = {0}; 
+	char *urlIn = {0};
+	char *urlInTxt = {0};
+	char *word = {0}; 
 
 	// Get set of urls
 	Set urls = getCollection("collection.txt");
 
+	// Create list rep
+	lListRep *L = createLList();
+
+	addWord(L, "word 1");
+	if (L->first == NULL) return 0;
+	addWord(L, "word 1");
+	addWord(L, "word 2");
+	addURL(L, "word 1", "url1");
+	addURL(L, "word 1", "url1");
+	addURL(L, "word 1", "url2");
+	showlListRep(L);
+	
 	// For each URL in set urls, make list of URLS for each word 
 	for (int i=0; i<nElems(urls); i++) {
 
@@ -55,8 +74,7 @@ int main(void) {
 			exit(1);
 		}
 		// Scan for words
-		int ii = 0; 
-		fscanf(fp, "s", word); 
+		fscanf(fp, "%s", word); 
 		if (strcmp(word, "Section-2") == 1) {
 			// For each word 
 			while (strcmp(word, "#end") != 0) {
@@ -70,7 +88,6 @@ int main(void) {
 	} 
 
 	// Output to txt file in alphabetical order 
-
 	return 0;
 }
 
@@ -82,43 +99,47 @@ lListRep *createLList() {
 		fprintf(stderr, "Malloc failed: Couldn't create lListRep.\n");
 		exit(1);
 	}
+	new->first = NULL;
+	new->nWords = 0;
 	return new;
 }
 
 // Add a word to the list (treat as a set)
-void addWord(lListRep *L, char w[MAX_WORD_SIZE]) {
+void addWord(lListRep *L, char *w) {
 	assert(L);
-	if (findWord(L, w)) return; 
+	if (findWord(L, w)) return;
 	key *new = malloc(sizeof(key));
-	if (new == NULL) {
+	new->word = malloc(strlen(w+1));
+	if (new == NULL || new->word == NULL) {
 		fprintf(stderr, "Malloc failed: Couldn't create key.\n");
 		exit(1);
 	}
+	L->nWords++;
 	strcpy(new->word, w);
-	new->urls == NULL;
-	new->next == NULL;
+	new->urls = NULL;
+	new->next = NULL;
 	if (L->first == NULL) {
 		L->first = new;
 		return;
 	}
 	key *curr = L->first;
 	for (curr = L->first; curr->next != NULL; curr = curr->next) /* Iterate to end of list*/;
-	curr->next = new;
+	curr->next = new; 
 	return;
 }
 
 // Linear search for list for word
 int findWord(lListRep *L, char *w) {
 	assert(L);
-	key *curr = L->first;
-	for (curr = L->first; curr = curr->next; curr != NULL) {
+	if (L->first == NULL) return 0;
+	for (key *curr = L->first; curr != NULL; curr = curr->next) {
 		if (strcmp(curr->word, w) == 0) return 1;
 	}
 	return 0;
 }
 
 // Add a url to key
-void addURL(lListRep *L, char word[MAX_WORD_SIZE], char url[MAXURL]) {
+void addURL(lListRep *L, char *word, char *url) {
 	assert(L);
 	// Get to key
 	key *curr = L->first;
@@ -137,20 +158,23 @@ void addURL(lListRep *L, char word[MAX_WORD_SIZE], char url[MAXURL]) {
 	if (findURL(curr, url)) return;
 	// Malloc url
 	urlNode *new = malloc(sizeof(urlNode));
-	if (new == NULL ) {
+	new->url = malloc(strlen(url+1));
+	if (new == NULL || new->url == NULL) {
 		fprintf(stderr, "Couldn't malloc urlNode.\n");
 		exit(1);
 	}
 	strcpy(new->url, url);
-	new->next == NULL;
+	new->next = NULL;
 	// Append
 	urlNode *currURL = curr->urls;
 	if (currURL == NULL) {
 		curr->urls = new;
+		curr->nUrls = 1;
 		return;
 	}
-	for (currURL = curr; currURL->next != NULL; currURL = currURL->next) /*Iterate through list*/;
+	for (currURL = curr->urls; currURL->next != NULL; currURL = currURL->next) /*Iterate through list*/;
 	currURL->next = new;
+	curr->nUrls++;
 	return;
 
 }
@@ -158,9 +182,26 @@ void addURL(lListRep *L, char word[MAX_WORD_SIZE], char url[MAXURL]) {
 // Linear search of key for url
 int findURL(key *k, char *url) {
 	assert(k);
-	urlNode *curr = k;
-	for (curr = k; curr = curr->next; curr != NULL) {
+	if (k->urls == NULL) return 0;
+	urlNode *curr = k->urls;
+	for (curr = k->urls; curr != NULL; curr = curr->next) {
 		if (strcmp(curr->url, url) == 0) return 1;
 	}
 	return 0;
+}
+
+// Show the list
+void showlListRep(lListRep *L) {
+	assert(L);
+	int bl = 0;
+	for (key *k = L->first; k != NULL; k = k->next) {
+		bl = 1;
+		printf("%s ", k->word);
+		for (urlNode *n = k->urls; n != NULL; n = n->next) {
+			printf(" %s", n->url);
+		}
+		printf("\n");
+	}
+	if (bl == 0) printf("Empty list.\n");
+	return;
 }

@@ -1,5 +1,6 @@
 // graph.c ... Graph of strings (adjacency matrix)
 // Written by John Shepherd, September 2015
+// Modified by Jesse Colville October 2017
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -177,7 +178,10 @@ static int vertexID(char *str, char **names, int N)
 // - add Str at end of Names
 int addVertex(char *str, char **names, int N)
 {
-	names[N] = strdup(str);
+	// Change strdup to malloc + strcpy to work with compiler
+	names[N] = malloc(strlen(str)+1);
+	assert(names[N] != NULL);
+	strcpy(names[N], str);
 	return N;
 }
 
