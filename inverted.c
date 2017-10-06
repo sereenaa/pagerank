@@ -39,7 +39,7 @@ int findURL(key *, char *);
 void showlListRep(lListRep *);
 
 
-int main(void) {
+int inverted(void) {
 
 	FILE *fp; 
 	char *urlIn = {0};

@@ -30,7 +30,7 @@ int   isConnectedIn(Graph, char *, char *);
 void  showGraph(Graph,int);
 int nEdgesInV(Graph, char *);
 int nEdgesOutV(Graph, char*);
-int outgoungFromOutgoing(Graph g, char *v);
+double outgoungFromOutgoing(Graph g, char *v);
 int incomingFromOutgoing(Graph, char *);
 
 static int vertexID(char *, char **, int);
@@ -94,7 +94,7 @@ int addEdge(Graph g, char *src, char *dest)
 		w = addVertex(dest,g->vertex,g->nV);
 		g->nV++;
 	}
-	g->edges[v][w] = 1;
+	if (v != w) g->edges[v][w] = 1; // Ignore self edges
 	return 1;
 }
 
@@ -213,19 +213,25 @@ int nEdgesInV(Graph g, char* v) {
 
 // Find the sum of outgoing links of nodes connected to target node
 // i.e. denominator on wOut
-int outgoingFromOutgoing(Graph g, char *v) {
+double outgoingFromOutgoing(Graph g, char *v) {
 	assert(g);
 	int row = vertexID(v, g->vertex, g->nV);
 	int column = 0;
 	int rowNested = 0;
 	int columnNested = 0;
-	int sum = 0;
+	double sum = 0;
+	double edgeSum = 0;
 	for (column = 0; column < g->nV; column++) {
 		if (g->edges[row][column]) {
 			rowNested = column;
 			for (columnNested = 0; columnNested < g->nV; columnNested++) {
-				if (g->edges[rowNested][columnNested]) sum++;
+				if (g->edges[rowNested][columnNested]) {
+					sum++;
+					edgeSum++;
+				}
 			}
+			if (edgeSum == 0) sum += 0.5; // Outgoing (k) = 0.5 according to spec
+			edgeSum = 0;
 		}
 	}
 	return sum;

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "queue.h"
 #include "graph.h"
 #include "set.h"
@@ -23,13 +24,14 @@ typedef dataListRep *dataList;
 
 dataList calculatePageRank(Graph, Set, double, double, int);
 dataList createDataList();
-dataList copyDataList(dataList);
+dataList newcopyDataList(dataList);
+void copyDataListPR(dataList P, dataList N);
 void insertDataListNode(dataList L, char *key, int degrees, double PRVal);
 void showDataList(dataList L);
 double calcPROthers(dataList, Graph, Node *);
 void myRevBubble(dataList);
 
-int pagerank(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
 	// Get arguments
 	if (argc != 4) {
 		fprintf(stderr, "Incorrect number of arguments.\n");
@@ -42,7 +44,6 @@ int pagerank(int argc, char *argv[]) {
 	// Get set of urls and create and initialise the graph
 	Set urls = getCollection("collection.txt");
 	Graph g = getGraph(urls);
-	showGraph(g, 1);
 
 	// Calculate pagerank
 	dataList L = calculatePageRank(g, urls, d, diffPR, maxIt);
@@ -77,7 +78,7 @@ dataList calculatePageRank(Graph g, Set urls, double d, double diffPR, int maxIt
 	}
 
 	// Copy the list which will as we need to keep track of prev iteration
-	dataList prevL = copyDataList(newL);
+	dataList prevL = newcopyDataList(newL);
 
 
 	i = 0;
@@ -86,11 +87,20 @@ dataList calculatePageRank(Graph g, Set urls, double d, double diffPR, int maxIt
 
 	while (i < maxIt && diff >= diffPR) {
 		i++;
-		// For each page
+		// Use pagerank formula
 		for (curr = newL->first; curr != NULL; curr = curr->next) {
-			curr->PRVal = (1.0 - d)/nPages + d*calcPROthers(prevL, g, curr);
+			curr->PRVal = (1 - d)/nPages + d*calcPROthers(prevL, g, curr);
 		}
-		prevL = copyDataList(newL);
+		// Use diff formula
+		diff = 0;
+		Node *currP = prevL->first;
+		Node *currN = newL->first;
+		while (currN != NULL) {
+			diff += fabs(currN->PRVal - currP->PRVal);
+			currN = currN->next;
+			currP = currP->next;
+		}
+		copyDataListPR(prevL, newL);
 	}
 	return newL;
 }
@@ -139,7 +149,7 @@ void showDataList(dataList L) {
 	}
 }
 
-dataList copyDataList(dataList L) {
+dataList newcopyDataList(dataList L) {
 	assert(L);
 	// Create list
 	dataListRep *new = malloc(sizeof(dataListRep));
@@ -156,6 +166,20 @@ dataList copyDataList(dataList L) {
 	return new;
 }
 
+// Assumes lists of equal length
+void copyDataListPR(dataList P, dataList N) {
+	assert(P);
+	assert(N);
+	Node *currP = P->first;
+	Node *currN = N->first;
+	while (currP != NULL) {
+		currP->PRVal = currN->PRVal;
+		currN = currN->next;
+		currP = currP->next;
+	}
+
+}
+
 // Calculates the "second half" of the page rank formula
 double calcPROthers(dataList L, Graph g, Node *n) {
 	assert(L);
@@ -164,17 +188,16 @@ double calcPROthers(dataList L, Graph g, Node *n) {
 	double wIn = 0;
 	double wOut = 0;
 	int wInDenom = incomingFromOutgoing(g, n->key);
-	int wOutDenom = outgoingFromOutgoing(g, n->key);
+	double wOutDenom = outgoingFromOutgoing(g, n->key);
 	for (curr = L->first; curr != NULL; curr = curr->next) {
 		if (isConnectedOut(g, n->key, curr->key)) {
 			wIn = nEdgesInV(g, curr->key) * 1.0 / wInDenom;
-			if (wOutDenom == 0) {
-				wOut = 0.5;
+			if (nEdgesOutV(g, curr->key) == 0) {
+				wOut = 0.5 / wOutDenom;
 			} else {
 				wOut = nEdgesOutV(g, curr->key) * 1.0 / wOutDenom;
 			}
-			sum += 1.0 * curr->PRVal * wIn * wOut;
-			//printf("n = %s, curr = %s\nnedgesinv = %d nedgesoutv = %d\nwInDen = %d wOutDenom = %d\nwin = %lf wout = %lf\nsum = %lf\n\n",n->key,curr->key,nEdgesInV(g, curr->key), nEdgesOutV(g, curr->key), wInDenom, wOutDenom,wIn, wOut, sum);
+			sum += curr->PRVal * wIn * wOut;
 		}
 	}
 	return sum;
