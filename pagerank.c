@@ -31,7 +31,7 @@ void showDataList(dataList L);
 double calcPROthers(dataList, Graph, Node *);
 void myRevBubble(dataList);
 
-int main(int argc, char *argv[]) {
+int pagerank(int argc, char *argv[]) {
 	// Get arguments
 	if (argc != 4) {
 		fprintf(stderr, "Incorrect number of arguments.\n");

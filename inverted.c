@@ -39,7 +39,7 @@ int findURL(key *, char *);
 void showlListRep(lListRep *);
 
 
-int inverted(void) {
+int main(void) {
 
 	FILE *fp; 
 	char *urlIn = {0};
@@ -108,23 +108,59 @@ lListRep *createLList() {
 void addWord(lListRep *L, char *w) {
 	assert(L);
 	if (findWord(L, w)) return;
+
+	// makes a new pointer to a word 
 	key *new = malloc(sizeof(key));
+
+	// makes a new array for the word in the newly made key 
 	new->word = malloc(strlen(w+1));
+
+	// tests that key and word creation succeeded 
 	if (new == NULL || new->word == NULL) {
 		fprintf(stderr, "Malloc failed: Couldn't create key.\n");
 		exit(1);
 	}
+
+	// increases the number of words in set by 1 
 	L->nWords++;
+
+	// puts the new word into the array 
 	strcpy(new->word, w);
+
+	// makes the word's url list empty 
 	new->urls = NULL;
+
+	// makes the word's next pointer point to NULL  
 	new->next = NULL;
+
+	// if the set is empty make the word the first word and return 
 	if (L->first == NULL) {
 		L->first = new;
 		return;
 	}
+
+	// if the word is not the first word 
+	// make a pointer, curr, point to the first word 
 	key *curr = L->first;
-	for (curr = L->first; curr->next != NULL; curr = curr->next) /* Iterate to end of list*/;
-	curr->next = new; 
+	
+	// iterate through list and insert word in alphabetical order 
+	for (curr = L->first; curr->next != NULL; curr = curr->next) { 
+		// compare each character in both the word in the list and the word to be inserted 
+		int k=0; 
+		while (k<strlen(w)) {
+			if (new->word[k] == curr->word[k]) { 
+				k++; 
+			} else if (new->word[k] > curr->word[k]) {
+				if (new->word[k] < curr->next->word[0]) {
+					new->next = curr->next; 
+					curr->next = new; 
+					return; 
+				} 
+			}
+		} 
+	} if (new->word[0] > curr->word[0]) {
+		curr->next = new; 
+	} 
 	return;
 }
 
