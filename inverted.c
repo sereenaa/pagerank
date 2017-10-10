@@ -28,6 +28,7 @@ typedef struct key {
 
 typedef struct urlNode {
 	char *url;
+	int val;
 	struct urlNode *next;
 } urlNode;
 
@@ -56,9 +57,9 @@ int main(void) {
 	if (L->first == NULL) return 0;
 	addWord(L, "word 1");
 	addWord(L, "word 2");
-	addURL(L, "word 1", "url1");
-	addURL(L, "word 1", "url1");
-	addURL(L, "word 1", "url2");
+	addURL(L, "word 1", "url11");
+	addURL(L, "word 1", "url11");
+	addURL(L, "word 1", "url12");
 	showlListRep(L);
 	
 	// For each URL in set urls, make list of URLS for each word 
@@ -199,17 +200,47 @@ void addURL(lListRep *L, char *word, char *url) {
 		fprintf(stderr, "Couldn't malloc urlNode.\n");
 		exit(1);
 	}
+	// Set values
 	strcpy(new->url, url);
 	new->next = NULL;
-	// Append
+	char value[10];
+	int a = 3;
+	int i = 0;
+	while (new->url[a] != '\0') {
+		value[i] = new->url[a];
+		a++;
+		i++;
+	}
+	value[i] = '\0';
+	new->val = atoi(value);
+	// Sorted insert
 	urlNode *currURL = curr->urls;
 	if (currURL == NULL) {
 		curr->urls = new;
 		curr->nUrls = 1;
 		return;
 	}
-	for (currURL = curr->urls; currURL->next != NULL; currURL = currURL->next) /*Iterate through list*/;
-	currURL->next = new;
+	int exitFlag = 0;
+	while (exitFlag == 0) {
+		// Head
+		if (curr->urls->val < new->val) {
+			new->next = curr->urls;
+			curr->urls = new;
+			exitFlag = 1;
+		}
+		// Tail
+		else if (currURL->next == NULL) {
+			currURL->next = new;
+			exitFlag = 1;
+		}
+		// Middle
+		else if (currURL->next->val < new->val) {
+			new->next = currURL->next;
+			currURL->next = new;
+			exitFlag = 1;
+		}
+		currURL = currURL->next;
+	}
 	curr->nUrls++;
 	return;
 
