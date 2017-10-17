@@ -84,8 +84,9 @@ int main(void) {
 		while (1) {
 			fscanf(fp, "%s", word);
 			if (strcmp(word, "Section-2") == 0) {
-				while (strcmp(word, "#end") != 0) {
+				while (1) {
 					fscanf(fp, "%s", word);
+					if (strcmp(word, "#end") == 0) break;
 					// For each word, convert to lower case, remove spaces & punctuation
 					for (int i=0; word[i]!= '\0'; i++) {
 						if (word[i] == ' ' || word[i] == '.' || word[i] == ',' || word[i] == ';' || word[i] == '?' ) {
@@ -94,6 +95,7 @@ int main(void) {
 						word[i] = tolower(word[i]);
 					}
 					// Add to set
+
 					addWord(L, word);
 					addURL(L, word, urlIn);
 				}
@@ -101,8 +103,6 @@ int main(void) {
 			}
 		}
 	}
-	//showlListRep(L);
-	/*
 	// Prints to output file.
 	FILE *outputStream;
 	outputStream = fopen("invertedIndex.txt", "w");
@@ -116,10 +116,10 @@ int main(void) {
 		for (urlNode *n = k->urls; n != NULL; n = n->next) {
 			fprintf(outputStream, " %s", n->url);
 		}
-		printf("\n");
+		fprintf(outputStream,"\n");
 	}
 	if (j == 0) printf("Empty list.\n");
-	return 0;*/
+	return 0;
 }
 
 // Helper functions
@@ -178,6 +178,10 @@ void addWord(lListRep *L, char *w) {
 
 	// iterate through list and insert word in alphabetical order
 	while (1) {
+		if (curr == NULL) {
+			prev->next = new;
+			break;
+		}
 		//printf("entered 1\n");
 		// compare each character in both the word in the list and the word to be inserted
 		if (strcmp(new->word, curr->word) > 0) { //new word is bigger than word in list
@@ -189,8 +193,8 @@ void addWord(lListRep *L, char *w) {
 			if (strcmp(curr->word, L->first->word) == 0)  { // Inserting at head
 				new->next = curr;
 				L->first = new;
-			}
-			else {
+			} 
+			else if (prev->next != NULL) {
 				prev->next = new;
 				new->next = curr;
 			}
@@ -198,8 +202,6 @@ void addWord(lListRep *L, char *w) {
 		}
 		//printf("success\n");
 	}
-	sleep(1);
-	showlListRep(L);
 	return;
 }
 
