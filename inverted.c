@@ -12,6 +12,7 @@
 #include "queue.h"
 #include "readData.h"
 #include "assert.h"
+#include <unistd.h>
 
 
 // Data struct for list of a list to represent which urls words are contained in
@@ -42,7 +43,6 @@ void showlListRep(lListRep *);
 
 
 int main(void) {
-
 	FILE *fp;
 	char *urlIn = malloc(sizeof(char)*100);
 	char *urlInTxt = malloc(sizeof(char)*100);
@@ -81,16 +81,9 @@ int main(void) {
 			exit(1);
 		}
 		// Scan for words
-		fscanf(fp, "%1023s", word);
-		while (strcmp(word, "#end") != 0) {
-			if (strcmp(word, "Section-2") == 1) {
-				while (strcmp(word, "#end") != 0) {
-			printf("hi\n");
-			fscanf(fp, "%1023s", word);
-			printf("%s\n", word);
-			// If start of words section, enter the loop
-			if (strcmp(word, "Section-2") == 1) {
-				printf("2\n");
+		while (1) {
+			fscanf(fp, "%s", word);
+			if (strcmp(word, "Section-2") == 0) {
 				while (strcmp(word, "#end") != 0) {
 					fscanf(fp, "%s", word);
 					// For each word, convert to lower case, remove spaces & punctuation
@@ -100,22 +93,16 @@ int main(void) {
 						}
 						word[i] = tolower(word[i]);
 					}
-					// If word not in lListRep
-					if (findWord(L, word) == 0) {
-						// Put word into list
-						addWord(L, word);
-					} else {
-						// Put URL with each word if not already there
-						if (findURL(L->first, word) == 0 ) {
-							addURL(L, word, urlIn);
-						}
-					}
+					// Add to set
+					addWord(L, word);
+					addURL(L, word, urlIn);
 				}
-			}
-		}
+				break;
 			}
 		}
 	}
+	//showlListRep(L);
+	/*
 	// Prints to output file.
 	FILE *outputStream;
 	outputStream = fopen("invertedIndex.txt", "w");
@@ -132,7 +119,7 @@ int main(void) {
 		printf("\n");
 	}
 	if (j == 0) printf("Empty list.\n");
-	return 0;
+	return 0;*/
 }
 
 // Helper functions
@@ -169,11 +156,8 @@ void addWord(lListRep *L, char *w) {
 
 	// increases the number of words in set by 1
 	L->nWords++;
-
-	printf("before: %s\n", w);
 	// puts the new word into the array
 	strcpy(new->word, w);
-	printf("after: %s\n", new->word);
 
 	// makes the word's url list empty
 	new->urls = NULL;
@@ -193,24 +177,29 @@ void addWord(lListRep *L, char *w) {
 	key *prev = L->first;
 
 	// iterate through list and insert word in alphabetical order
-	while (curr != NULL) {
+	while (1) {
 		//printf("entered 1\n");
 		// compare each character in both the word in the list and the word to be inserted
 		if (strcmp(new->word, curr->word) > 0) { //new word is bigger than word in list
 			prev = curr;
 			curr = curr->next;
-		} else {
-			//printf("inside else\n");
+		}
+		else {
 			// insert before current word
-			new->next = curr;
-			curr = new;
-			return;
+			if (strcmp(curr->word, L->first->word) == 0)  { // Inserting at head
+				new->next = curr;
+				L->first = new;
+			}
+			else {
+				prev->next = new;
+				new->next = curr;
+			}
+			break;
 		}
 		//printf("success\n");
 	}
-	//printf("hello\n");
-	prev->next = new;
-	//printf("hi\n");
+	sleep(1);
+	showlListRep(L);
 	return;
 }
 
@@ -231,7 +220,7 @@ void addURL(lListRep *L, char *word, char *url) {
 	key *curr = L->first;
 	while (1) {
 		if (curr == NULL) {
-			printf("Word not in set. Unable to add URL.\n");
+			printf("Word (%s) not in set. Unable to add URL.\n", word);
 			return;
 		}
 		if (strcmp(curr->word, word) == 0) {

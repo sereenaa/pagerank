@@ -32,6 +32,7 @@ double calcPROthers(dataList, Graph, Node *);
 void myRevBubble(dataList);
 
 int pagerank(int argc, char *argv[]) {
+	//printf("here\n)");
 	// Get arguments
 	if (argc != 4) {
 		fprintf(stderr, "Incorrect number of arguments.\n");
@@ -44,6 +45,7 @@ int pagerank(int argc, char *argv[]) {
 	// Get set of urls and create and initialise the graph
 	Set urls = getCollection("collection.txt");
 	Graph g = getGraph(urls);
+	//showGraph(g, 0);
 
 	// Calculate pagerank
 	dataList L = calculatePageRank(g, urls, d, diffPR, maxIt);
@@ -197,9 +199,11 @@ double calcPROthers(dataList L, Graph g, Node *n) {
 			} else {
 				wOut = nEdgesOutV(g, curr->key) * 1.0 / wOutDenom;
 			}
+			printf("wIn = %.7lf wOut = %.7lf\n", wIn, wOut);
 			sum += curr->PRVal * wIn * wOut;
 		}
 	}
+
 	return sum;
 }
 
