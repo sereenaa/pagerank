@@ -15,6 +15,7 @@ typedef struct url {
     int nWords;
     double PRVal;
     struct url *next;
+    int printed;
 } url;
 
 typedef struct urlRep {
@@ -104,6 +105,7 @@ void insertURL(urlRep *U, char *urlN) {
     strcpy(new->urlN, urlN);
     new->nWords = 0;
     new->next = NULL;
+    new->printed = 0;
     // Pagerank a bit more tricky to set
     FILE *fp;
     fp = fopen("pagerankList.txt", "r");
