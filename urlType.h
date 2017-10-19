@@ -18,5 +18,6 @@ void countWord(urlRep *, char*);
 void lowerArgs(int, char **);
 void modTf(urlRep *, char*, char*);
 void calcTfIdf(urlRep *, int, int);
+void printUrlsC(urlRep *);
 
 #endif

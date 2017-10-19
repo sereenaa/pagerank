@@ -8,7 +8,7 @@
 
 int findN(char*);
 
-int main(int argc, char *argv[]) {
+int p2(int argc, char *argv[]) {
 
     // Check there is at least one word to search for
     if (argc < 2) {
@@ -55,6 +55,7 @@ int main(int argc, char *argv[]) {
     int N = findN("collection.txt"); // N in idf equation
     calcTfIdf(U, N, idfDenom);
     showUrls(U);
+    return 0;
 }
 
 // Find total number of Documents

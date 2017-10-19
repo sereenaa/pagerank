@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include "urlType.h"
 
-int seachPagerank(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     if (argc < 2) {
         printf("Not enough args.\n");
         exit(1);
@@ -40,6 +40,6 @@ int seachPagerank(int argc, char* argv[]) {
         }
     }
     fclose(fp);
-    showUrls(U);
+    printUrlsC(U);
     return 0;
 }

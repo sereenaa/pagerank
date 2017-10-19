@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <math.h>
 
 // Data structures
 typedef struct url {
@@ -57,6 +58,7 @@ int insertURL(urlRep *U, char *urlN) {
     assert(new->urlN);
 
     // Set values
+    U->nUrls++;
     strcpy(new->urlN, urlN);
     new->nWords = 0;
     new->next = NULL;
@@ -198,7 +200,51 @@ void calcTfIdf(urlRep *U, int N, int idfDenom) {
     assert(U);
 
     for (url *curr = U->first; curr != NULL; curr = curr->next) {
-        curr->idf = 1.0 * N / idfDenom;
-        curr->tfIdf = curr->tf / curr->idf;
+        curr->idf = log10(1.0 * N / idfDenom);
+        curr->tfIdf = curr->tf * curr->idf;
+    }
+}
+
+// Serena Xu
+void printUrlsC(urlRep *U) {
+    assert(U);
+    if (U->first == NULL) {
+        printf("No urls.\n");
+    }
+    else {
+      url *print = U->first;
+      url *currA = U->first;
+      int i=0;
+      while (currA->next != NULL) {
+        currA = U->first;
+        //printf("%s/%d/%f/%d\n", currA->urlN, currA->nWords, currA->PRVal, currA->printed);
+        if (i == 30) break;
+        if (currA->printed == 1) {
+          while (currA->printed == 1) {
+            currA = currA->next;
+          }
+        }
+        print = currA;
+        url *currB = U->first;
+        while(currB != NULL) {
+          /*printf("currA is %s(%d)(%f)(%d)\ncurrB is %s(%d)(%f)(%d)\nprint is %s(%d)(%f)(%d)\n\n",
+          currA->urlN, currA->nWords, currA->PRVal, currA->printed,
+          currB->urlN, currB->nWords, currB->PRVal, currB->printed,
+          print->urlN, print->nWords, print->PRVal, print->printed);*/
+          if ((((currB->nWords > print->nWords) || ((currB->nWords == print->nWords)
+          && (currB->PRVal > print->PRVal))) && (currB->printed != 1))) {
+            print = currB;
+          }
+          if (currB->next != NULL) {
+            currB = currB->next;
+          } else {
+            break; 
+          }
+        }
+        i++;
+        print->printed = 1;
+        printf("%s, %d, %f, %d\n", print->urlN, print->nWords, print->PRVal, print->printed);
+        if (i >= U->nUrls || i >= 30) break;
+      }
     }
 }
