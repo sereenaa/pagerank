@@ -15,6 +15,8 @@ int seachPagerank(int argc, char* argv[]) {
     }
     // Create url set
     urlRep *U = urlRepCreate();
+    // Turn arguments into lowercase
+    lowerArgs(argc, argv);
     
     // Get the nWords in each URL (dont add if 0)
     FILE *fp;

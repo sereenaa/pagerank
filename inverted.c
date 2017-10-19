@@ -16,7 +16,7 @@
 #include "keyType.h"
 
 
-int main(void) {
+int inverted(void) {
 	FILE *fp;
 	char *urlIn = malloc(sizeof(char)*100);
 	char *urlInTxt = malloc(sizeof(char)*100);
