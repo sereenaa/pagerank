@@ -1,13 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define MAXURL 20
 
 
 int findN(char*);
 
-int main(argc, char *argv[]) {
-    
+int abc(int argc, char *argv[]) {
+
+    // Check there is a word to search for
+    if (argc < 2) {
+        printf("Not enough args.\n");
+        exit(1);
+    }
+
+
+
     int N = findN("collection.txt"); // N in idf equation
-    
+    printf("N = %d\n", N);
+    return 0;
 }
 
 // Find total number of Documents
