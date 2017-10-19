@@ -13,6 +13,7 @@ int abc(int argc, char *argv[]) {
         exit(1);
     }
 
+    
 
 
     int N = findN("collection.txt"); // N in idf equation
