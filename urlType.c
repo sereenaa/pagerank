@@ -243,7 +243,7 @@ void printUrlsC(urlRep *U) {
         }
         i++;
         print->printed = 1;
-        printf("%s, %d, %f, %d\n", print->urlN, print->nWords, print->PRVal, print->printed);
+        printf("%s\n", print->urlN);
         if (i >= U->nUrls || i >= 30) break;
       }
     }
