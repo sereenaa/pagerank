@@ -185,8 +185,7 @@ char *getNth(Set s, int n) {
 	return curr->val;
 }
 
-void insertInvWord(Set s, char *word) {
-	assert(s);
-	
-
+int isEmpty(Set s) {
+	if (s->elems == 0) return 1;
+	return 0;
 }

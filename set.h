@@ -18,5 +18,6 @@ int  nElems(Set);
 void showSet(Set);
 // Jesse Colville
 char *getNth(Set, int);
+int isEmpty(Set);
 
 #endif
