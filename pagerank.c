@@ -13,6 +13,7 @@ typedef struct Node {
 	char key[MAXURL];
 	int degrees;
 	double PRVal;
+	double sum;
 	struct Node *next;
 } Node;
 
@@ -60,7 +61,7 @@ int main(int argc, char *argv[]) {
 	}
 	Node *curr = L->first;
 	for (curr = L->first; curr != NULL; curr = curr->next) {
-		fprintf(fp, "%s, %d, %lf\n", curr->key, curr->degrees, curr->PRVal);
+		fprintf(fp, "%s, %d, %.7f\n", curr->key, curr->degrees, curr->PRVal);
 	}
 	fclose(fp);
 
@@ -90,8 +91,13 @@ dataList calculatePageRank(Graph g, Set urls, double d, double diffPR, int maxIt
 	while (i < maxIt && diff >= diffPR) {
 		i++;
 		// Use pagerank formula
+		for (curr = prevL->first; curr != NULL; curr = curr->next) {
+			calcPROthers(newL, g, curr);
+		}
+		// Use pagerank formula
 		for (curr = newL->first; curr != NULL; curr = curr->next) {
-			curr->PRVal = (1 - d)/nPages + d*calcPROthers(prevL, g, curr);
+			curr->PRVal = (1.0 - d) / nPages + d * curr->sum;
+			curr->sum = 0;
 		}
 		// Use diff formula
 		diff = 0;
@@ -126,6 +132,7 @@ void insertDataListNode(dataList L, char *key, int degrees, double PRVal) {
 	n->degrees = degrees;
 	n->PRVal = PRVal;
 	n->next = NULL;
+	n->sum = 0;
 
 	// Add to list
 	if (L->nElems == 0) {
@@ -146,7 +153,7 @@ void showDataList(dataList L) {
 		return;
 	}
 	while (curr != NULL) {
-		printf("%s, %d, %lf\n", curr->key, curr->degrees, curr->PRVal);
+		printf("%s, %d, %.7f\n", curr->key, curr->degrees, curr->PRVal);
 		curr = curr->next;
 	}
 }
@@ -192,15 +199,16 @@ double calcPROthers(dataList L, Graph g, Node *n) {
 	int wInDenom = incomingFromOutgoing(g, n->key);
 	double wOutDenom = outgoingFromOutgoing(g, n->key);
 	for (curr = L->first; curr != NULL; curr = curr->next) {
-		if (isConnectedIn(g, n->key, curr->key)) {
+		if (isConnectedOut(g, n->key, curr->key)) {
 			wIn = nEdgesInV(g, curr->key) * 1.0 / wInDenom;
 			if (nEdgesOutV(g, curr->key) == 0) {
 				wOut = 0.5 / wOutDenom;
 			} else {
 				wOut = nEdgesOutV(g, curr->key) * 1.0 / wOutDenom;
 			}
-			printf("wIn[%s][%s] = %.7lf wOut[%s][%s] = %.7lf\n", n->key, curr->key, wIn, n->key, curr->key, wOut);
-			sum += curr->PRVal * wIn * wOut;
+			//printf("wIn[%s][%s] = %.7lf wOut[%s][%s] = %.7lf\n", n->key, curr->key, wIn, n->key, curr->key, wOut);
+			curr->sum += n->PRVal*wIn*wOut;
+			//printf("%s: sum = %.7lf\n", curr->key, curr->sum);
 		}
 	}
 
@@ -230,7 +238,7 @@ void myRevBubble(dataList L) {
 				tempDeg = n->degrees;
 				n->degrees = n->next->degrees;
 				n->next->degrees = tempDeg;
-
+				// Don't bother swapping sum
 				swapped = 1;
 			}
 		}
