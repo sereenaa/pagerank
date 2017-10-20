@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 	// Calculate pagerank
 	dataList L = calculatePageRank(g, urls, d, diffPR, maxIt);
 	myRevBubble(L);
-	showDataList(L);
+	//showDataList(L);
 
 	// Print to pagerankList.txt
 	FILE *fp = fopen("pagerankList.txt", "w");
