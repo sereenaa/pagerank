@@ -31,7 +31,7 @@ void showDataList(dataList L);
 double calcPROthers(dataList, Graph, Node *);
 void myRevBubble(dataList);
 
-int pagerank(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
 	//printf("here\n)");
 	// Get arguments
 	if (argc != 4) {
@@ -192,14 +192,14 @@ double calcPROthers(dataList L, Graph g, Node *n) {
 	int wInDenom = incomingFromOutgoing(g, n->key);
 	double wOutDenom = outgoingFromOutgoing(g, n->key);
 	for (curr = L->first; curr != NULL; curr = curr->next) {
-		if (isConnectedOut(g, n->key, curr->key)) {
+		if (isConnectedIn(g, n->key, curr->key)) {
 			wIn = nEdgesInV(g, curr->key) * 1.0 / wInDenom;
 			if (nEdgesOutV(g, curr->key) == 0) {
 				wOut = 0.5 / wOutDenom;
 			} else {
 				wOut = nEdgesOutV(g, curr->key) * 1.0 / wOutDenom;
 			}
-			printf("wIn = %.7lf wOut = %.7lf\n", wIn, wOut);
+			printf("wIn[%s][%s] = %.7lf wOut[%s][%s] = %.7lf\n", n->key, curr->key, wIn, n->key, curr->key, wOut);
 			sum += curr->PRVal * wIn * wOut;
 		}
 	}
