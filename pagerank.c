@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
 	
 	// Get set of urls and create and initialise the graph
 	Set urls = getCollection("collection.txt");
+	if (isEmpty(urls)) return 1;
 	Graph g = getGraph(urls);
 	//showGraph(g, 0);
 
