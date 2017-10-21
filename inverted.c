@@ -16,7 +16,7 @@
 #include "keyType.h"
 
 
-int inverted(void) {
+int main(void) {
 	FILE *fp;
 	char *urlIn = malloc(sizeof(char)*100);
 	char *urlInTxt = malloc(sizeof(char)*100);
@@ -24,6 +24,7 @@ int inverted(void) {
 
 	// Get set of urls
 	Set urls = getCollection("collection.txt");
+	if (isEmpty(urls)) return 1;
 
 	// Create list rep
 	lListRep *L = createLList();

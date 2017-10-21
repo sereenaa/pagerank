@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include "urlType.h"
 
-int searchpagerank(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     if (argc < 2) {
         printf("Not enough args.\n");
         exit(1);
@@ -29,9 +29,9 @@ int searchpagerank(int argc, char* argv[]) {
     char line[BUFFSIZE];
     // Scan through inverted index looking for urls
     while (fgets(line, BUFFSIZE, fp)) {
-        tk = strtok(line," ,");
+        tk = strtok(line," ,\n");
         if (isMemberArg(argv, tk, argc)) {
-            tk = strtok(NULL," ,");
+            tk = strtok(NULL," ,\n");
             while (tk != NULL) {
                 insertURL(U, tk);
                 countWord(U, tk);

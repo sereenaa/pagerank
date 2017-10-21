@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
+#include <errno.h>
 
 // Data structures
 typedef struct url {
@@ -70,7 +71,7 @@ int insertURL(urlRep *U, char *urlN) {
     FILE *fp;
     fp = fopen("pagerankList.txt", "r");
     if (fp == NULL) {
-        printf("Could not read file.\n");
+        printf("pagerankList.txt: %s\n", strerror(errno));
         exit(1);
     }
     char word[BUFFSIZE];
@@ -113,6 +114,7 @@ url *findLast(url *url) {
     }
 }
 
+// For debugging
 void showUrls(urlRep *U) {
     assert(U);
     if (U->first == NULL) {
@@ -162,7 +164,7 @@ void modTf(urlRep *U, char* urlN, char* target) {
     FILE *fp;
     fp = fopen(urlTxt, "r");
     if (fp == NULL) {
-        printf("Could not read file.\n");
+        printf("%s: %s\n", urlTxt, strerror(errno));
         exit(1);
     }
 
@@ -205,11 +207,10 @@ void calcTfIdf(urlRep *U, int N, int idfDenom) {
     }
 }
 
-// Serena Xu
 void printUrlsC(urlRep *U) {
     assert(U);
     if (U->first == NULL) {
-        printf("No urls.\n");
+        //printf("No urls.\n");
     }
     else {
       url *print = U->first;
@@ -227,10 +228,6 @@ void printUrlsC(urlRep *U) {
         print = currA;
         url *currB = U->first;
         while(currB != NULL) {
-          /*printf("currA is %s(%d)(%f)(%d)\ncurrB is %s(%d)(%f)(%d)\nprint is %s(%d)(%f)(%d)\n\n",
-          currA->urlN, currA->nWords, currA->PRVal, currA->printed,
-          currB->urlN, currB->nWords, currB->PRVal, currB->printed,
-          print->urlN, print->nWords, print->PRVal, print->printed);*/
           if ((((currB->nWords > print->nWords) || ((currB->nWords == print->nWords)
           && (currB->PRVal > print->PRVal))) && (currB->printed != 1))) {
             print = currB;
@@ -244,7 +241,45 @@ void printUrlsC(urlRep *U) {
         i++;
         print->printed = 1;
         printf("%s\n", print->urlN);
-        if (i >= U->nUrls || i >= 30) break;
+        if (i >= U->nUrls || i >= 30) return;
       }
+      printf("%s\n", print->urlN);
+    }
+}
+
+void printPart2(urlRep *U) {
+    assert(U);
+    if (U->first == NULL) {
+    }
+    else {
+      url *print = U->first;
+      url *currA = U->first;
+      int i=0;
+      while (currA->next != NULL) {
+        currA = U->first;
+        //printf("%s/%d/%f/%d\n", currA->urlN, currA->nWords, currA->PRVal, currA->printed);
+        if (currA->printed == 1) {
+          while (currA->printed == 1) {
+            currA = currA->next;
+          }
+        }
+        print = currA;
+        url *currB = U->first;
+        while(currB != NULL) {
+          if (currB->tfIdf > print->tfIdf && currB->printed == 0) {
+            print = currB;
+          }
+          if (currB->next != NULL) {
+            currB = currB->next;
+          } else {
+            break; 
+          }
+        }
+        i++;
+        print->printed = 1;
+        printf("%s %.6f\n", print->urlN, print->tfIdf);
+        if (i >= U->nUrls || i >= 30) return;
+      }
+      printf("%s %.6f\n", print->urlN, print->tfIdf);
     }
 }

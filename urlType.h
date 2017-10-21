@@ -1,5 +1,5 @@
 // urlType.h. Interface for linked lists of url data structure
-// Jesse Colville
+// Jesse Colville and Serena Xu
 
 #ifndef URLTYPE_H
 #define URLTYPE_H
@@ -19,5 +19,6 @@ void lowerArgs(int, char **);
 void modTf(urlRep *, char*, char*);
 void calcTfIdf(urlRep *, int, int);
 void printUrlsC(urlRep *);
+void printPart2(urlRep *);
 
 #endif
